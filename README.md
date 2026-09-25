@@ -74,3 +74,15 @@ npm run dev
   `backend/app/routers/<模块>.py`，业务规则在 `backend/app/services/<模块>.py`。
 - 列表接口统一返回 `{ items, total, page, size }`，动作接口统一返回 `{ ok, message }`。
 - 状态流转只允许在 `app/services` 里改，路由层不做业务判断。
+
+### 状态评估：风险定位
+
+- 风险等级由健康分值统一推导（&lt;60 重大、&lt;75 较大、&lt;90 一般、其余低风险），
+  评估结论须以风险等级开头，保证各入口口径一致。
+- `GET /api/assess/risk-board?period=` 返回风险定位看板：高风险在前、同设备跨周期
+  只取最新周期结论、未出结论不参与排序；首评（已定级）与复评（已复评）分开统计；
+  健康分值缺失（未评定 / 未录入 / 非 0~100 数值）单列并给出原因。
+- 定级与复评分别走 `POST /api/assess/{id}/grade`、`POST /api/assess/{id}/review`，
+  校验不通过时在 `field_errors` 里逐字段返回原因；老的「发起复评」动作仍走
+  `POST /api/assess/{id}/actions`，保持无表单直达。
+- 风险定位页：`/assess/risk`（`frontend/src/views/assess/RiskBoard.vue`）。

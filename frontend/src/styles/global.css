@@ -33,3 +33,39 @@ body { margin: 0; background: #f6f8fb; color: #1f2937; }
 .link { border: none; background: none; color: var(--brand); cursor: pointer; padding: 0; }
 .page-foot { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--muted); }
 .error-text { color: #b42318; }
+.text-muted { color: var(--muted); }
+
+/* 风险等级标签：风险越高颜色越重，与风险定位排序口径一致 */
+.risk-tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; line-height: 18px; white-space: nowrap; }
+.risk-tag[data-risk="critical"] { background: #fee4e2; color: #b42318; }
+.risk-tag[data-risk="high"] { background: #fef0c7; color: #b54708; }
+.risk-tag[data-risk="medium"] { background: #e0efff; color: #175cd3; }
+.risk-tag[data-risk="low"] { background: #dcfae6; color: #027a48; }
+.cell-warn { color: #b42318; font-weight: 600; }
+.row-critical { background: #fff6f5; }
+.row-actions .link.legacy { color: var(--muted); }
+
+/* 风险定位页 */
+.block-title { font-size: 14px; margin: 18px 0 8px; display: flex; align-items: baseline; gap: 8px; }
+.block-hint { font-size: 12px; font-weight: normal; color: var(--muted); }
+.reason-cell { color: #b54708; }
+.stat-alert .stat-value { color: #b42318; }
+.consistency-box { margin-top: 16px; padding: 10px 14px; border: 1px solid #fecdca; background: #fffbfa; border-radius: 8px; }
+.consistency-box ul { margin: 6px 0; padding-left: 18px; font-size: 13px; color: #b42318; }
+.consistency-box li { margin: 4px 0; }
+
+/* 定级 / 复评弹窗 */
+.modal-mask { position: fixed; inset: 0; background: rgba(16, 24, 40, 0.45); display: flex; align-items: center; justify-content: center; z-index: 100; }
+.modal { background: #fff; border-radius: 10px; padding: 20px 22px; width: 480px; max-width: calc(100vw - 32px); max-height: calc(100vh - 48px); overflow-y: auto; }
+.modal-title { margin: 0; font-size: 16px; }
+.modal-sub { margin: 4px 0 14px; font-size: 13px; color: var(--muted); }
+.form-item { display: block; margin-bottom: 12px; }
+.form-item > span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.form-item em { color: #b42318; font-style: normal; margin-left: 2px; }
+.form-item input, .form-item textarea { width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 7px 9px; font-size: 13px; font-family: inherit; }
+.form-item input[readonly] { background: #f1f5f9; color: #334155; }
+.form-hint { display: block; font-size: 12px; color: var(--muted); margin-top: 3px; }
+.field-error { display: block; font-size: 12px; color: #b42318; margin-top: 3px; }
+.form-item:has(.field-error) input, .form-item:has(.field-error) textarea { border-color: #f04438; }
+.form-error { margin: 4px 0 10px; font-size: 13px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }

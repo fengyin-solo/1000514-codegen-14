@@ -19,6 +19,7 @@ class ActionResult(BaseModel):
     ok: bool
     message: str
     entry: dict[str, Any] | None = None
+    field_errors: dict[str, str] = Field(default_factory=dict)
 
 
 class EntryPayload(BaseModel):
