@@ -3,10 +3,10 @@
     <header class="page-head">
       <div>
         <h2>状态评估管理</h2>
-        <p class="page-desc">维护评估记录，围绕评估编号、评估对象、评估周期、健康分值做登记、筛选与状态流转。</p>
+        <p class="page-desc">维护评估记录，围绕评估编号、评估对象、评估周期、健康分值做登记、筛选与状态流转；高风险设备可到「风险定位」集中查看。</p>
       </div>
       <div class="page-actions">
-        <button class="btn primary" type="button" @click="openCreate">登记评估记录</button>
+        <RouterLink class="btn primary" to="/risk">查看风险定位</RouterLink>
         <button class="btn" type="button" @click="exportRows">导出状态评估清单</button>
       </div>
     </header>
@@ -36,7 +36,14 @@
       </thead>
       <tbody>
         <tr v-for="row in rows" :key="String(row.id)">
-          <td v-for="column in columns" :key="column">{{ row[column] ?? '—' }}</td>
+          <td v-for="column in columns" :key="column">
+            <template v-if="column === '风险等级'">
+              <span v-if="deriveLevel(row)" class="risk-tag" :class="tagClass(deriveLevel(row))">{{ deriveLevel(row) }}</span>
+              <span v-else class="muted-text">—</span>
+              <span v-if="levelMismatch(row)" class="mismatch-flag" :title="mismatchTip(row)">口径不符</span>
+            </template>
+            <template v-else>{{ row[column] ?? '—' }}</template>
+          </td>
           <td class="row-actions">
             <button
               v-for="action in actions"
@@ -66,6 +73,7 @@
 import { onMounted, ref } from 'vue'
 
 import { request } from '@/api/client'
+import { RISK_LEVELS, parseScore, riskLevelOf } from '@/views/risk/riskRules'
 
 type Row = Record<string, string | number | null>
 
@@ -81,6 +89,26 @@ const errorMessage = ref('')
 const filters = ref<Record<string, string>>({})
 const filterFields = columns.slice(0, 3)
 
+function deriveLevel(row: Row): string {
+  const score = parseScore(row['健康分值'])
+  return score === null ? '' : riskLevelOf(score)
+}
+
+function tagClass(level: string): string {
+  return { 高风险: 'tag-high', 中风险: 'tag-mid', 低风险: 'tag-low' }[level] ?? ''
+}
+
+/** 其他入口登记的风险等级若与分值口径不一致，做个可见标记，与风险定位页的巡检呼应。 */
+function levelMismatch(row: Row): boolean {
+  const derived = deriveLevel(row)
+  const stored = String(row['风险等级'] ?? '').trim()
+  return Boolean(derived && stored && (RISK_LEVELS as readonly string[]).includes(stored) && stored !== derived)
+}
+
+function mismatchTip(row: Row): string {
+  return `登记为${row['风险等级']}，按健康分值应为${deriveLevel(row)}`
+}
+
 function resetFilters() {
   filters.value = {}
   void reload()
@@ -88,10 +116,6 @@ function resetFilters() {
 
 function exportRows() {
   window.open(`${ENDPOINT}/export`, '_blank')
-}
-
-function openCreate() {
-  errorMessage.value = '评估记录登记入口尚未接入审批流'
 }
 
 async function runAction(action: string, row: Row) {
@@ -128,3 +152,21 @@ async function reload() {
 
 onMounted(reload)
 </script>
+
+<style scoped>
+.tag-high { color: #b42318; }
+.tag-mid { color: #b54708; }
+.tag-low { color: #027a48; }
+.risk-tag { font-weight: 600; }
+.muted-text { color: var(--muted); }
+.mismatch-flag {
+  margin-left: 6px;
+  font-size: 11px;
+  color: #b42318;
+  border: 1px solid #fda29b;
+  background: #fef3f2;
+  border-radius: 4px;
+  padding: 0 4px;
+  cursor: help;
+}
+</style>
